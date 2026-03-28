@@ -1,0 +1,91 @@
+name: sr4ir_edsr_x4
+model_type: sr4ir_cls
+task: cls
+num_threads: 2
+print_freq: 20
+scale: 4
+manual_seed: 200
+deterministic: true
+
+data:
+  path: /content/drive/MyDrive/car_dataset
+  train_resize_size: 128
+  train_crop_size: 128
+  val_resize_size: 128
+  val_crop_size: 128
+
+network_sr:
+  name: edsr
+  n_blocks: 4
+  n_feats: 32
+
+network_cls:
+  name: ResNet18
+  num_classes: 40
+
+path:
+  network_sr: ~
+  network_cls: ResNet18_Weights.IMAGENET1K_V1
+  strict_load: false
+
+train:
+  batch_size: 8
+  epoch: 30
+  save_freq: 5
+  eval_freq: 1000
+  warmup_epoch: 2
+
+  optim_sr:
+    type: AdamW
+    lr: 0.00005
+    weight_decay: 0
+    betas: [0.9, 0.999]
+
+  optim_cls:
+    type: SGD
+    lr: 0.005
+    momentum: 0.9
+    weight_decay: 0.0001
+
+  scheduler_sr:
+     type: MultiStepLR
+     milestones: [15, 25]
+     gamma: 0.5
+
+  scheduler_cls:
+     type: MultiStepLR
+     milestones: [15, 25]
+     gamma: 0.5
+
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+
+  tdp_opt:
+    type: FeatureLoss
+    loss_weight: 1.0
+    criterion: l1
+    layer_weights:
+      l4: 1.0
+
+  ce_sr_opt:
+    type: CELoss
+    label_smoothing: 0.0
+    loss_weight: 0.34
+
+  ce_hr_opt:
+    type: CELoss
+    label_smoothing: 0.0
+    loss_weight: 0.34
+
+  ce_cqmix_opt: 
+    type: CELoss
+    label_smoothing: 0.0
+    loss_weight: 0.34
+
+test:
+  batch_size: 8
+  calculate_lpips: false
+
+dist_url: null
