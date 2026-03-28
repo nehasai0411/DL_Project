@@ -43,7 +43,6 @@ def main():
             best_acc = train_acc
           
 
-          # This will now correctly show the best of the printed batch values
           print(f"Epoch {epoch} Train Acc: {train_acc:.2f}% | Best: {best_acc:.2f}%")
             
         total_time = time.time() - start_time
