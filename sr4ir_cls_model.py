@@ -185,23 +185,19 @@ class SR4IRClassificationModel(BaseModel):
         
         # Calculate accuracy for this specific batch
         acc1_sr_batch, _ = calculate_accuracy(pred_sr, label, topk=(1, 5))
-        # ✅ ADD THIS
+  
         _, preds = pred_sr.max(1)
         correct += (preds == label).sum().item()
         total += label.size(0)
         metric_logger.meters["acc1_sr"].update(acc1_sr_batch.item(), n=batch_size)
 
-        # Update max_logged_acc ONLY at the exact print intervals (e.g., 0, 20, 40)
-        # if iter % self.opt['print_freq'] == 0:
-        #     current_batch_acc = acc1_sr_batch.item()
-        #     if current_batch_acc > max_logged_acc:
-        #         max_logged_acc = current_batch_acc
+     
 
         metric_logger.update(lr_sr=round(self.optimizer_sr.param_groups[0]["lr"], 8))
         metric_logger.update(lr_cls=round(self.optimizer_cls.param_groups[0]["lr"], 8))
         self.update_learning_rate()
 
-    #return max_logged_acc
+ 
     train_acc = 100.0 * correct / total if total > 0 else 0
     return train_acc
 
